@@ -24,7 +24,7 @@ description: >- # this means to ignore newlines until "baseurl:"
  This blog is a compilation of my work from Stat 386.
 baseurl: "/stat386-projects" # keep this the same or change it to the name of the repository 
 url: "https://maxsprice.github.io" #  change this to "https://<your-github-username>.github.io"
-image: "assets/images/andrewandjudywed-197.jpg"
+image: "assets/andrewandjudywed-197.jpg"
 author: Max Price
 copyright: MSP # Your initials or what you want the copyright to be.  Leave empty for no copyright
 
