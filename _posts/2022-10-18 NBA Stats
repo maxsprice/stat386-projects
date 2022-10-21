@@ -13,73 +13,31 @@ There are millions of websites across the internet full of information. Often ti
 
 ### 1. Determine if pulling this data is ethical
 
-As stated previously, Beautiful Soup is a python library used for scraping data from websites, or more specifically HTML and XML files that can be pulled from websites. While it can be used in various ways, such as navigating or modifying text we’ll focus more on how to use Beautiful Soup to pull data from a website into a .csv file that we can easily use for our own analysis. 
+To start, we need to determine if pulling this data is ethical and legal. Assuming we are using this data for academic or personal use, there shouldn't be any legal issues. If you plan to use this data in a commercial or business setting you should reach out to the author of the site to get permission to use this data.
 
 ### 2. Decide what data we would like included
 
-The first step in pulling data into an organized format is to find the URL of the page you want to scrape data from and assign it to a variable in python. In some situations you will need information from several pages, in this case, you can add a parameter that will loop through the pages for you. In this example, we’ll be pulling data from several pages of fantasy football players found on ESPN. Here is a link to the site for your reference. 
+Once you have determined that this data is okay to pull, we need to decide what specific data we would like to include from the site. First find the data you would like to include from the webpage, then right click on it, and select inspect.
+#Insert image of example data and inspect box
+Now that we know what data we would like to include, let's copy the url of the page into our code and use BeautifulSoup, the Python package, to organize the HTML we are pulling from the webpage.
 
-### 3. Find what tags are associated with those columns and rows
+### 3. Find HTML Tags
 
-### 4. Follow the code below, adjusting for given set
+Now that we have the HTML from the site, we need to determine what specific data we would like to include from the site. Using inspect as mentioned previously, we can find what tags are associated with the data on the webpage. With the NBA players data we want to pull, we will need to first find the tags for the url of the webpage with the players data from each draft
+#Include picture of URL in HTML
+Because the site only gives the second portion of the URL we will need to join it on to the end of the original URL.
+#Code joining these together
+Now that we are able to access the data of each NBA draft, we need to figure out the tags for each of the rows and columns. We will use the inspect tool again to do this.
+#Screenshot of some of the tags
+We find that each row has it's own tag, and within that we can find the data for each column. Write these down, as they will be key in the next step. 
+
+### 4. Loop through and pull data
+
+Now that we have these HTML tags and the URLs of each page, we can loop through them to pull the data we want for our dataframe. Tools like find_all that are included in the BeautifulSoup package make this much easier.
 
 ### 5. Pull to a dataframe
 
-### 6. Start your analysis
-https://fantasy.espn.com/football/players/add?leagueId=698883686
+Now that we have our data, let's pull it into a dataframe.
 
-```python
-site_url = "https://fantasy.espn.com/football/players/add?leagueId=2758927"
-```
-
-Next, we need to load the packages required to parse the document we just loaded. Importing the package response will allow us to store the data pulled from the website specified. The package pandas will be used to create a dataframe, and store the data pulled within it. Pandas will also be useful later for running different analysis as many statistical functions are written into it. Requests is a package that facilitates the process of requesting data in Python, and Beautiful Soup is the package that pieces the HTML files into something legible
-
-```python
-from urllib import response
-import pandas as pd
-import requests as req
-from bs4 import BeautifulSoup as bs
-```
-
-We now need to identify the class names from the HTML that store the data we want to view. I found it easiest to open Developer Tools, click on HTML, then use ctrl + f and type in a piece of the data. 
-
-
-<img src="https://raw.githubusercontent.com/maxsprice/stat386-projects/main/assets/images/KuppScreenshot.jpg" alt="" style="width:600px;"/>
-
-
-Next, we write a function to scrape the information we want. This function will parse through the HTML pulled from the page and find the pertinent data.
-
-```python
-def scraper():
-    for i in range(1,5): #We're just grabbing the information of the players from the first 5 pages
-        page_stats = []
-        page = "?page="+str(i)
-        url = site_url + page
-        response = req.get(url)
-        soup = bs(response.content, 'html.parser')
-        players = soup.findAll("div",attrs={"class","Table__TBODY"})
-    
-    for j in range(len(players)):
-        page_stats.append(players[j].find("p").text)
-    
-    for k in range(len(page_stats)):
-        player_stats.append(page_stats[k])
-        return player_stats
-```
-
-### Storing the Data
-
-After parsing through the data, we now want to pull it into a data frame. We will use the package pandas to create and modify the data.
-
-```python
-stats = scraper()
-i = range(1, len(stats)+1)
-stats_df = pd.DataFrame({'stat':stats}, index=i)
-stats_df.to_csv('stats.csv',sep=',')
-```
-
-Now that we have the data organized, we can run all sorts of different analyses!
-
-### Conclusion
-While scraping data from a website may feel like a daunting task, the package Beautiful Soup makes it manageable. Becoming familiar with this package simplifies many seemingly complex processes, saves hours of work, and if you’re lucky can give you an edge against your friends in fantasy football. After learning more about this package, what are some other uses you can think of for Beautiful Soup?
+Doing this will allow us to analyze the data we have pulled. Think of all that this allows us to do, we know how to pull data from websites, now we can use these numbers to make better decisions and better predictions. We'll go over how to analyze this data in my next blog post
 
