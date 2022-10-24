@@ -4,7 +4,7 @@ title:  "Web Scraping NBA Stats"
 date:   2022-10-18
 author: Max Price
 description: Let's scrape data from basketball reference to learn more about NBA franchises.
-image: /assets/images/souperbowl.jpg
+image: /assets/images/nbadraft.jfif
 ---
 
 # Web Scraping Data
@@ -18,26 +18,95 @@ To start, we need to determine if pulling this data is ethical and legal. Assumi
 ### 2. Decide what data we would like included
 
 Once you have determined that this data is okay to pull, we need to decide what specific data we would like to include from the site. First find the data you would like to include from the webpage, then right click on it, and select inspect.
+
 <img src="https://raw.githubusercontent.com/maxsprice/stat386-projects/main/assets/images/inspect tag.jpg" alt="" style="width:600px;"/>
-Now that we know what data we would like to include, let's copy the url of the page into our code and use BeautifulSoup, the Python package, to organize the HTML we are pulling from the webpage.
+
+Now that we know what data we would like to include, let's copy the url of the page into our code and use BeautifulSoup, the Python package, to organize the HTML we are pulling from the webpage. We also need to import the packages we will be using to import and parse the data.
+
+```python
+from bs4 import BeautifulSoup
+import requests
+import re
+import pandas as pd
+import numpy as np
+
+url = 'https://www.basketball-reference.com/draft/'
+r = requests.get(url)
+r.status_code
+soup = BeautifulSoup(r.text)
+```
+
+Using the package BeautifulSoup we have now organized the HTML from the site which will make pulling information much easier.
 
 ### 3. Find HTML Tags
 
-Now that we have the HTML from the site, we need to determine what specific data we would like to include from the site. Using inspect as mentioned previously, we can find what tags are associated with the data on the webpage. With the NBA players data we want to pull, we will need to first find the tags for the url of the webpage with the players data from each draft
-#Include picture of URL in HTML
+Now that we have the HTML from the site, we need to determine what specific data we would like to include from the site. Using inspect as mentioned previously, we can find what tags are associated with the data on the webpage. With the NBA players data we want to pull, we will need to first find the tags for the url of the webpage with the players data from each draft.
+
+<img src="https://raw.githubusercontent.com/maxsprice/stat386-projects/main/assets/images/html tag.jpg" alt="" style="width:600px;"/>
+
 Because the site only gives the second portion of the URL we will need to join it on to the end of the original URL.
-#Code joining these together
+
+```python
+links = []
+for link in soup.find_all('a'):
+    href = link.get('href')
+    if 'draft/' in href:
+        links.append(href)
+# for i in range(1,len(links)):
+#     links[i] = ''.join(str(links[i]))
+links = ',https://www.basketball-reference.com'.join(links)
+links = links.split(",")
+links = links[1:77]
+links
+```
+
 Now that we are able to access the data of each NBA draft, we need to figure out the tags for each of the rows and columns. We will use the inspect tool again to do this.
-#Screenshot of some of the tags
+
+<img src="https://raw.githubusercontent.com/maxsprice/stat386-projects/main/assets/images/coltags.jpg" alt="" style="width:600px;"/>
+
 We find that each row has it's own tag, and within that we can find the data for each column. Write these down, as they will be key in the next step. 
 
 ### 4. Loop through and pull data
 
 Now that we have these HTML tags and the URLs of each page, we can loop through them to pull the data we want for our dataframe. Tools like find_all that are included in the BeautifulSoup package make this much easier.
 
+To make this process easier, we'll create a function we can place within the for loop that will pull the data we are looking for.
+
+```python
+def directory_item(bs, tag, search, direct, col):
+    item = bs.find_all(tag, {"data-stat": search})
+    for info in item:
+        direct[col].append(info.get_text())
+```
+
+To use this function we will call it with the appropriate values for each column. 
+
+```python
+directory = {'Pick':[], 'Team':[], 'Player':[], 'College':[], 'Yrs Played':[], 'Min Per Game':[], 'Points Avg.':[], 'Rebounds Avg.':[], 'Assists Avg.':[]}
+for url in links:
+    r = requests.get(url)
+    if r.status_code == 200:
+        bs = BeautifulSoup(r.text)
+        directory_item(bs, "td", "pick_overall",directory, 'Pick')
+        directory_item(bs, "td", "team_id",directory, 'Team')
+        directory_item(bs, "td", "player",directory, 'Player')
+        directory_item(bs, "td", "college_name",directory, 'College')
+        directory_item(bs, "td", "seasons",directory, 'Yrs Played')
+        directory_item(bs, "td", "mp_per_g",directory, 'Min Per Game')
+        directory_item(bs, "td", "pts_per_g",directory, 'Points Avg.')
+        directory_item(bs, "td", "trb_per_g",directory, 'Rebounds Avg.')
+        directory_item(bs, "td", "ast_per_g",directory, 'Assists Avg.')
+```
+
+The function can be called on each column, and to save the value pulled, the function appends it to the directory created at the beginning of this code chunk. This can easily be replicated for data on any website, you just need to adjust the values called within the function and perhaps make some minor adjustments to the function.
+
 ### 5. Pull to a dataframe
 
 Now that we have our data, let's pull it into a dataframe.
 
-Doing this will allow us to analyze the data we have pulled. Think of all that this allows us to do, we know how to pull data from websites, now we can use these numbers to make better decisions and better predictions. We'll go over how to analyze this data in my next blog post
+```python
+Playerdf = pd.DataFrame(directory)
+```
+
+Doing this will allow us to analyze the data we have pulled. Think of all that this allows us to do, we know how to pull data from websites, now we can use these numbers to make better decisions and better predictions. Check out my next blog post for a walkthrough of how to analyze the data pulled!
 
