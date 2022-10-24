@@ -18,7 +18,7 @@ To start, we need to determine if pulling this data is ethical and legal. Assumi
 ### 2. Decide what data we would like included
 
 Once you have determined that this data is okay to pull, we need to decide what specific data we would like to include from the site. First find the data you would like to include from the webpage, then right click on it, and select inspect.
-#Insert image of example data and inspect box
+<img src="https://raw.githubusercontent.com/maxsprice/stat386-projects/main/assets/images/inspect tag.jpg" alt="" style="width:600px;"/>
 Now that we know what data we would like to include, let's copy the url of the page into our code and use BeautifulSoup, the Python package, to organize the HTML we are pulling from the webpage.
 
 ### 3. Find HTML Tags
